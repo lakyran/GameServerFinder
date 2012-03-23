@@ -27,15 +27,8 @@ function jsonOutput($query){
 	return $jsonString;
 }
 
-$db = new SQLite3("csdb.sqlite");
+$db = new SQLite3("./db/csdb.sqlite");
 $result = $db->query("select * from cs");
-#echo "\nresult = " . $result . "\nAbove\n";
-
-#$result = $dbHandle->query("SELECT * FROM cs");
-#while ($row = $result->fetchArray()) {
-#    var_dump($row);
-#}
-
 $jsonString = jsonOutput($result);
 echo $jsonString;
 
