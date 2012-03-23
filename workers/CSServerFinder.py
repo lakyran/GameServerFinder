@@ -35,9 +35,9 @@ class CSServerFinder(DatagramProtocol):
                     serverMapName text,
                     serverType text,
                     serverGameName text,
-                    serverPlayers int,
-                    serverPlayersMax int,
-                    serverLatency double)''')
+                    serverPlayer int,
+                    serverPlayerMax int,
+                    serverLatency int)''')
             self.dbConnection.commit()
         except Exception as e:
             print(e)

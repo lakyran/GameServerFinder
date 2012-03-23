@@ -6,8 +6,8 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title></title>
-  <meta name="description" content="">
+  <title>IIIT Game Servers Finder</title>
+  <meta name="description" content="Portal to find all game servers running inside IIIT">
 
   <meta name="viewport" content="width=device-width">
   <link rel="stylesheet" href="css/style.css">
@@ -16,28 +16,32 @@
 </head>
 <body>
   <!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
-  <header>
-
+  <header class="mainHeader">
+    <h1>IIIT Game Servers Finder</h1>
   </header>
   <div role="main">
-
+    <table class="gamesTable">
+        <tr class="gameTitle csTitle"><td></td></tr>
+        <tr><td>
+            <table id="csServers" class="serverList"></table>
+        </td></tr>
+        <tr><td><br/><br/></td></tr>
+        <tr class="gameTitle dotaTitle"><td></td></tr>
+        <tr><td>
+            <table id="dotaServers" class="serverList"><tr style="text-align:center;"><td>Not Yet Implemented</td></tr></table>
+        </td></tr>
+        <tr><td><br/><br/></td></tr>
+        <tr class="gameTitle aoeTitle"><td></td></tr>
+        <tr><td>
+            <table id="aoeServers" class="serverList"><tr style="text-align:center;"><td>Not Yet Implemented</td></tr></table>
+        </td></tr>
+    </table>
   </div>
-  <footer>
-
+  <footer class="mainFooter">
   </footer>
-
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
   <script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.1.min.js"><\/script>')</script>
-
-  <script src="js/plugins.js"></script>
   <script src="js/script.js"></script>
-
-  <script>
-    var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
-    (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-    g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
-    s.parentNode.insertBefore(g,s)}(document,'script'));
-  </script>
 </body>
 </html>
