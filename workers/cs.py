@@ -1,58 +1,13 @@
-import sqlite3
-import threading
-import socket, struct, time, sys
-import traceback
-
+import sqlite3, struct, socket, time
 from twisted.internet.protocol import DatagramProtocol
+from twisted.internet.task import LoopingCall
 from twisted.internet import reactor
 
-class Echo(DatagramProtocol):
-
-    def datagramReceived(self, data, (host, port)):
-            serverResponseList = struct.unpack("!" + "B"*len(serverResponse), serverResponse)
-            serverPlayerMax = serverPlayer = serverGameName = serverType = serverMapName = serverName = serverPort = serverIP = ""
-            i = 5
-            while chr(serverResponseList[i]) != ":":
-                serverIP += chr(serverResponseList[i])
-                i += 1
-            i += 1
-            while chr(serverResponseList[i]) != "\0":
-                serverPort += chr(serverResponseList[i])
-                i += 1
-            i += 1
-            while chr(serverResponseList[i]) != "\0":
-                serverName += chr(serverResponseList[i])
-                i += 1
-            i += 1
-            while chr(serverResponseList[i]) != "\0":
-                serverMapName += chr(serverResponseList[i])
-                i += 1
-            i += 1
-            while chr(serverResponseList[i]) != "\0":
-                serverType += chr(serverResponseList[i])
-                i += 1
-            i += 1
-            while chr(serverResponseList[i]) != "\0":
-                serverGameName += chr(serverResponseList[i])
-                i += 1
-            i += 1
-            serverPlayer = serverResponseList[i]
-            i += 1
-            serverPlayerMax = serverResponseList[i]
-                
-            print ("Server Found" +
-                   "\n\tServer Name : " + serverName +
-                   "\n\tServer IP : " + serverIP + ":" + serverPort +
-                   "\n\tMap Name : " + serverMapName +
-                   "\n\tType : " + serverType +
-                   "\n\tPlayers : " + str(serverPlayer) + "/" + str(serverPlayerMax) +
-                   "\n")
-            dbCursor.execute("insert into cs values (?,?,?,?,?,?,?,?)", (serverIP, serverPort, serverName, serverMapName, serverType, serverGameName, serverPlayer, serverPlayerMax))
-            dbConnection.commit()
-
-
-class CSServerScaner (threading.Thread):
-    def __init__ (self):
+class CSServerFinder(DatagramProtocol):
+    def startProtocol(self):
+        self.dbConnection = sqlite3.connect("../db/csdb.sqlite")
+        self.dbCursor = self.dbConnection.cursor()
+        self.createDatabase()
         self.dstPort = 27015
         self.magicList = [0xff, 0xff, 0xff, 0xff, 0x54, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x20, 0x45, 0x6e, 0x67, 0x69, 0x6e, 0x65, 0x20, 0x51, 0x75, 0x65, 0x72, 0x79, 0x00]
         self.magicString = struct.pack("!" + "B"*len(self.magicList), *self.magicList)
@@ -61,51 +16,65 @@ class CSServerScaner (threading.Thread):
                          "10.2.24.255", "10.2.28.255", "10.2.32.255", "10.2.36.255", "10.2.4.255" , "10.2.40.244",
                          "10.2.44.255", "10.2.8.255" , "10.3.3.255" , "10.3.4.255" , "10.4.3.255" , "10.5.2.255" ,
                          "172.17.16.255"]
-        self.sendSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sendSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sendSocket.bind(("", 56565))
-        threading.Thread.__init__(self)
+        self.transport.getHandle().setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        self.lastSendTime = None
+        self.pingerTask = LoopingCall(self.serverPinger)
+        self.pingerTask.start(10.0)
+        
+    def createDatabase (self):
+        try:
+            self.dbCursor.execute('drop table if exists cs')
+            self.dbCursor.execute('''
+               create table cs(
+                    serverIP text,
+                    serverPort text,
+                    serverName text,
+                    serverMapName text,
+                    serverType text,
+                    serverGameName text,
+                    serverPlayers int,
+                    serverPlayersMax int,
+                    serverLatency double)''')
+            self.dbConnection.commit()
+        except Exception as e:
+            print(e)
 
-    def run (self):
-        self.dbConnection = sqlite3.connect("./csdb.sqlite")
-        self.dbCursor = self.dbConnection.cursor()
-        while True:
-            try:
-                self.dbCursor.execute('delete from cs')
-                self.dbConnection.commit()
-                for self.ipAddr in self.ipRanges:
-                    self.sendSocket.sendto(self.magicString, (self.ipAddr, self.dstPort))
-                time.sleep(10)
-            except Exception as e:
-                print (e)
+    def serverPinger (self):
+        self.dbCursor.execute('delete from cs')
+        self.dbConnection.commit()
+        self.lastSendTime = time.time()
+        try:
+            for self.ipAddr in self.ipRanges:
+                self.transport.write(self.magicString, (self.ipAddr, self.dstPort))
+        except Exception as e:
+                print(e)
                 traceback.print_exc()
-                return False
 
+    def datagramReceived (self, serverResponse, (host, port)):
+        serverLatency = int((time.time() - self.lastSendTime)*1000)
+        serverResponseList = serverResponse.split("\0")
+        serverIP, serverPort = serverResponseList[0].split("m")[1].split(":")
+        serverName = serverResponseList[1]
+        serverMapName = serverResponseList[2]
+        serverType = serverResponseList[3]
+        serverGameName = serverResponseList[4]
+        serverPlayer = ord(serverResponseList[5][0])
+        serverPlayerMax = ord(serverResponseList[5][1])
+        
+        print ("Server Found" +
+               "\n\tServer Name : " + serverName +
+               "\n\tServer IP : " + serverIP + ":" + serverPort +
+               "\n\tMap Name : " + serverMapName +
+               "\n\tType : " + serverType +
+               "\n\tPlayers : " + str(serverPlayer) + "/" + str(serverPlayerMax) +
+               "\n\tLatency : " + str(serverLatency) + 
+               "\n")
+        try:
+            self.dbCursor.execute("insert into cs values (?,?,?,?,?,?,?,?,?)", (serverIP, serverPort, serverName, serverMapName, serverType, serverGameName, serverPlayer, serverPlayerMax, serverLatency))
+            self.dbConnection.commit()
+        except Exception as e:
+            print(e)
 
 if __name__ == "__main__":
-    dbConnection = sqlite3.connect("./csdb.sqlite")
-    dbCursor = dbConnection.cursor()
-    try:
-        dbCursor.execute('drop table if exists cs')
-        dbCursor.execute('''
-           create table cs(
-                serverIP text,
-                serverPort text,
-                serverName text,
-                serverMapName text,
-                serverType text,
-                serverGameName text,
-                serverPlayers int,
-                serverPlayersMax int)''')
-        dbConnection.commit()
-    except Exception as e:
-        print (e)
-        sys.exit(0)
-
-    bSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    bSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    bSocket.bind(("", 56565))
-    WorkerThread = CSServerScaner()
-    WorkerThread.start()
-
-
+    reactor.listenUDP(56565, CSServerFinder())
+    reactor.run()
