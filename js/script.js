@@ -1,5 +1,5 @@
 function fillCSTable() {
-    $.getJSON('http://10.1.33.175/GameServerFinder/cs.php',
+    $.getJSON('http://10.1.33.175/GameServerFinder/JSON/cs.json',
      function (jsonObj) {
         tbodyElem = document.getElementById("csServers");
         tbodyElem.innerHTML = "";
@@ -48,5 +48,4 @@ function refreshCSTable() {
 
 jQuery(document).ready(function() {
     refreshCSTable();
-
 });
