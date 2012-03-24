@@ -56,6 +56,7 @@ class CSServerFinder(DatagramProtocol):
 
     def createJSON (self):
         cur = self.dbConnection.cursor()
+        cur.execute("select * from cs")
         jsonString = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
         jsonString.insert(0, '{"serverIP":"Server IP", "serverPort":"Port", "serverName":"Server Name", "serverMapName":"Map", "serverType":"Type", "serverGameName":"Game Name", "serverPlayer":"Players", "serverPlayerMax":"Max Players", "serverLatency":"Latency"}')
         cur.close()
