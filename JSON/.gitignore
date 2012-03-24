@@ -23,7 +23,6 @@ nbproject
 *.sublime-project
 *.sublime-workspace
 *.sqlite
-*.json
 !.gitignore
 !.htaccess
 

@@ -1,4 +1,4 @@
-import sqlite3, struct, socket, time
+import sqlite3, struct, socket, time, json
 from twisted.internet.protocol import DatagramProtocol
 from twisted.internet.task import LoopingCall
 from twisted.internet import reactor
@@ -49,8 +49,19 @@ class CSServerFinder(DatagramProtocol):
             self.lastSendTime = time.time()
             for self.ipAddr in self.ipRanges:
                 self.transport.write(self.magicString, (self.ipAddr, self.dstPort))
+            time.sleep(2.0)
+            self.createJSON()
         except Exception as e:
                 print(e)
+
+    def createJSON (self):
+        cur = self.dbConnection.cursor()
+        jsonString = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
+        cur.close()
+        print (jsonString)
+        filePointer = open("../JSON/cs.json", 'w')
+        filePointer.write(json.dumps(jsonString))
+        filePointer.close()
 
     def datagramReceived (self, serverResponse, (host, port)):
         try:
