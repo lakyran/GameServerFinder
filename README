@@ -1,0 +1,15 @@
+This little code find all the webserver running inside IIIT and display it as a nifty little page 
+inside a browser.
+
+To start the Server:
+    1. Move the code to a folder inside the webserver root directory
+    2. Start main.py in workers folder
+        #> cd workers
+        #> python main.py
+    3. Start the webserver
+    
+
+In case of any problem or suggestions drop me a mail at : argetlam.akshet [at] gmail [dot] com
+
+--
+Akshet Pandey
