@@ -17,10 +17,10 @@ function fillCSTable() {
             tdElem.innerHTML = "Latency";
 
         if (typeof jsonObj.length === "undefined" || jsonObj.length === 0) {
-                trElem = tbodyElem.insertRow(tbodyElem.rows.length);               
+                trElem = tbodyElem.insertRow(tbodyElem.rows.length);
                 tdElem = trElem.insertCell(trElem.cells.length);
                 tdElem.innerHTML = "No Server Running";
-                tdElem.className = "csRows";
+                tdElem.className = "csRows noServerRow";
                 tdElem.colSpan = "5";
         }
         else {

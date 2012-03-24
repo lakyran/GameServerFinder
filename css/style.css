@@ -140,16 +140,19 @@ td { vertical-align: top; }
     height:100px;
     background-image : url('../img/aoeBanner.gif');
     background-repeat : no-repeat;
-/*    background-position : right -140px; */
     background-size : 100% 100px;
 }
-
 
 .csTopRow {
     background-color : #ffd700;
     color : black;
 }
+
 .csRows {
     background-color : #aa9500;
     color : black;
+}
+
+.noServerRow {
+    text-align : center;
 }
