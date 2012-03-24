@@ -1,41 +1,52 @@
 function fillCSTable() {
-    $.getJSON('http://10.1.33.175/GameServerFinder/JSON/cs.json',
-     function (jsonObj) {
+    var jsonURL = document.URL + "JSON/cs.json";
+    $.getJSON(jsonURL, function (jsonObj) {
         tbodyElem = document.getElementById("csServers");
         tbodyElem.innerHTML = "";
-            trElem = tbodyElem.insertRow(tbodyElem.rows.length);
-            trElem.className = "csTopRow"; 
-            tdElem = trElem.insertCell(trElem.cells.length);
-            tdElem.innerHTML = "IP";
-            tdElem = trElem.insertCell(trElem.cells.length);
-            tdElem.innerHTML = "Name";
-            tdElem = trElem.insertCell(trElem.cells.length);
-            tdElem.innerHTML = "Map";
-            tdElem = trElem.insertCell(trElem.cells.length);
-            tdElem.innerHTML = "Players";
-            tdElem = trElem.insertCell(trElem.cells.length);
-            tdElem.innerHTML = "Latency";
+        jsonDict = JSON.parse(jsonObj[0]);
+        trElem = tbodyElem.insertRow(tbodyElem.rows.length);
+        trElem.className = "csTopRow";
+        tdElem = trElem.insertCell(trElem.cells.length);
+        tdElem.innerHTML = jsonDict["serverName"];
+        tdElem.className = "csServerName";
+        tdElem = trElem.insertCell(trElem.cells.length);
+        tdElem.innerHTML = jsonDict["serverMapName"];
+        tdElem.className = "csServerMapName";
+        tdElem = trElem.insertCell(trElem.cells.length);
+        tdElem.innerHTML = jsonDict["serverIP"];
+        tdElem.className = "csServerIP";
+        tdElem = trElem.insertCell(trElem.cells.length);
+        tdElem.innerHTML = jsonDict["serverLatency"];
+        tdElem.className = "csServerLatency";
+        tdElem = trElem.insertCell(trElem.cells.length);
+        tdElem.innerHTML = jsonDict["serverPlayer"];
+        tdElem.className = "csServerPlayer";
+        tdElem = trElem.insertCell(trElem.cells.length);
+        tdElem.innerHTML = "Player List";
+        tdElem.className = "csServerPlayerList";
 
-        if (typeof jsonObj.length === "undefined" || jsonObj.length === 0) {
+        if (jsonObj.length === 1) {
                 trElem = tbodyElem.insertRow(tbodyElem.rows.length);
+                trElem.className = "csRows noServerRow";
                 tdElem = trElem.insertCell(trElem.cells.length);
                 tdElem.innerHTML = "No Server Running";
-                tdElem.className = "csRows noServerRow";
-                tdElem.colSpan = "5";
+                tdElem.colSpan = "6";
         }
         else {
             for (var i = 0; i < jsonObj.length ; i++){
-                trElem = tbodyElem.insertRow(tbodyElem.rows.length);               
+                jsonDict = JSON.parse(jsonObj[i]);
+                trElem = tbodyElem.insertRow(tbodyElem.rows.length);
+                trElem.className = "csRow";
                 tdElem = trElem.insertCell(trElem.cells.length);
-                tdElem.innerHTML = jsonObj[i]["serverIP"];
+                tdElem.innerHTML = jsonDict["serverName"];
                 tdElem = trElem.insertCell(trElem.cells.length);
-                tdElem.innerHTML = jsonObj[i]["serverName"];
+                tdElem.innerHTML = jsonDict["serverMapName"];
                 tdElem = trElem.insertCell(trElem.cells.length);
-                tdElem.innerHTML = jsonObj[i]["serverMapName"];
+                tdElem.innerHTML = jsonDict["serverIP"];
                 tdElem = trElem.insertCell(trElem.cells.length);
-                tdElem.innerHTML = jsonObj[i]["serverPlayer"] + "/" + jsonObj[i]["serverPlayerMax"];
+                tdElem.innerHTML = jsonDict["serverLatency"] + " ms";
                 tdElem = trElem.insertCell(trElem.cells.length);
-                tdElem.innerHTML = jsonObj[i]["serverLatency"] + " ms";
+                tdElem.innerHTML = jsonDict["serverPlayer"] + "/" + jsonDict["serverPlayerMax"];
             }
         }
      });
