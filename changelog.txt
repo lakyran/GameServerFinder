@@ -1,0 +1,16 @@
+24 - March - 2012 - v0.6.1
+    > Cleaned webpage even more, removed banner image and put text instead,
+    as suggested by Himi. :p
+    > First home at felicity server :D
+
+24 - March - 2012 - v0.6
+    > Shifted webpage to AJAX. Now you don't need to refresh the page
+    to get the latest server list, server list is refreshed automatically
+    every 10 seconds
+    > Cleaned webpage a bit
+    > Everything is now in python, removed php files
+
+23 - March - 2012 - v0.5
+    > First Working version
+    > Created CS worker
+    > Created Base Webpage
