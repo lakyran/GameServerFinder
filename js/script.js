@@ -36,8 +36,8 @@ function fillCSTable() {
                 tdElem.colSpan = "6";
         }
         else {
-            for (var i = 0; i < jsonObj.length ; i++){
-                jsonDict = JSON.parse(jsonObj[i]);
+            for (var i = 1; i < jsonObj.length ; i++){
+                jsonDict = jsonObj[i];
                 trElem = tbodyElem.insertRow(tbodyElem.rows.length);
                 trElem.className = "csRow";
                 tdElem = trElem.insertCell(trElem.cells.length);
@@ -50,6 +50,8 @@ function fillCSTable() {
                 tdElem.innerHTML = jsonDict["serverLatency"] + " ms";
                 tdElem = trElem.insertCell(trElem.cells.length);
                 tdElem.innerHTML = jsonDict["serverPlayer"] + "/" + jsonDict["serverPlayerMax"];
+                tdElem = trElem.insertCell(trElem.cells.length);
+                tdElem.innerHTML = "&lt;Not Yet Implemented&gt;";
             }
         }
      });
