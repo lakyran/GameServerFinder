@@ -1,5 +1,8 @@
 function fillCSTable() {
-    var jsonURL = document.URL + "JSON/cs.json";
+    var sourceURL = document.URL.split("/")
+    if (sourceURL[sourceURL.length-1] === "index.html")
+        delete sourceURL[sourceURL.length-1]
+    var jsonURL = sourceURL.join("/") + "JSON/cs.json";
     $.getJSON(jsonURL, function (jsonObj) {
         tbodyElem = document.getElementById("csServers");
         tbodyElem.innerHTML = "";
